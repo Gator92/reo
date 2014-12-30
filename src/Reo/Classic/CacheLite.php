@@ -321,7 +321,7 @@ class Reo_Classic_CacheLite
         $this->save($key, $value, null);
     }
 
-    public function has($id, $group)
+    public function has($id, $group = null)
     {
         $this->_setRefreshTime();
         $this->_setFileName($id, $group);
