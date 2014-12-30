@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true" bootstrap="../../../bootstrap.php">
+  <testsuites>
+    <testsuite name="Reo Classic Components Test Suite">
+      <directory>./Tests/</directory>
+    </testsuite>
+  </testsuites>
+  <groups>
+    <exclude>
+      <group>ignore</group>
+    </exclude>
+  </groups>
+</phpunit>
