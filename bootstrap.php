@@ -1,5 +1,5 @@
 <?php
-require_once(($path = __DIR__ . '/src'). '/Reo/Autoload/Autoloader.php');
+require_once(($path = __DIR__ . '/src') . '/Reo/Autoload/Autoloader.php');
 $autoloader = new Reo\Autoload\Autoloader(
     array(),
     null,

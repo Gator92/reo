@@ -233,7 +233,7 @@ class Reo_Classic_CacheLite
     public function setOption($name, $value)
     {
         if (isset(self::$availableOptions[$name])) {
-                $this->{$name} = $value;
+            $this->{$name} = $value;
         }
     }
     
@@ -252,7 +252,7 @@ class Reo_Classic_CacheLite
         $this->_setFileName($id, $group);
         //according to php docs this is unecessary
         //clearstatcache();
-        if (!@file_exists($this->_file)) {
+        if (!@file_exists($this->_file) || 'apache' === $this->fileNameHashMode && is_dir($this->_file)) {
             return null;
         }
         //@note the ttl will be stored for readcontrol and handled in _read, check here against the global ttl or lifetime
@@ -508,6 +508,7 @@ class Reo_Classic_CacheLite
             if (false !== $group && $dir === $this->cacheDir) {
                 //group at top level
                 $dir .= '/' . $group;
+                $this->emptyDirs[] = $dir;//will be emptied
             }
             $motif = false;
         } else {
@@ -667,7 +668,7 @@ class Reo_Classic_CacheLite
             }
             return $data;
         }
-        return $this->raiseError('Cache_Lite : Unable to read cache !', -2);
+        return $this->raiseError(sprintf('Cache_Lite : Unable to read cache [%s]', $this->_file), -2);
     }
     
     /**

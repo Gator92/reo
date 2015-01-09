@@ -10,7 +10,7 @@ class CacheLiteTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        if (!@class_exists('vfsStreamWrapper', false)) {
+        if (!@class_exists('org\\bovigo\\vfs\\vfsStreamWrapper', false)) {
             $this->markTestSkipped('vfsStreamWrapper not found');
             return;
         }
@@ -149,6 +149,71 @@ class CacheLiteTest extends PHPUnit_Framework_TestCase
         $this->assertNull($cache->get('burger', 'paradise'));
         //orphaned dirs are removed
         $this->assertFalse(vfsStreamWrapper::getRoot()->getChild('cache')->hasChildren());
+    }
+
+    public function testRemoveEntry()
+    {
+        $cache = $this->getCache();
+        $cache->save('nacho', 'chipolte');
+        $this->assertEquals('chipolte', $cache->get('nacho'));
+        $cache->remove('nacho');
+        $this->assertNull($cache->get('nacho'));
+
+        //with group
+        $cache->save('burger', 'cheese', $group = 'paradise');
+        $cache->save('nacho', 'guac', $group = 'paradise');
+        $this->assertEquals('cheese', $cache->get('burger', $group));
+        $this->assertNull($cache->get('paradise'));
+
+        //no group, should not be removed
+        $cache->remove('burger');
+        $this->assertEquals('cheese', $cache->get('burger', $group));
+        //group, should be removed
+        $cache->remove('burger', 'paradise');
+        $this->assertNull($cache->get('burger', $group));
+        //others in group should remain
+        $this->assertEquals('guac', $cache->get('nacho', $group));
+    }
+
+    public function testRemoveEntryApacheMode()
+    {
+        $cache = $this->getCache(true);
+        $cache->save('nacho/cheese', 'chipolte');
+        $cache->save('nacho/chips', 'guac');
+        $this->assertNull($cache->get('nacho'));
+        $this->assertEquals('chipolte', $cache->get('nacho/cheese'));
+        $cache->remove('nacho/cheese');
+        $this->assertNull($cache->get('nacho/cheese'));
+        $this->assertEquals('guac', $cache->get('nacho/chips'));
+        $cache->remove('nacho/chips');
+        $this->assertNull($cache->get('nacho/chips'));
+
+        //orphaned dir
+        $this->assertTrue(vfsStreamWrapper::getRoot()->hasChild($dir = 'cache/nacho'));
+        $cache->clean('nacho');
+        $this->assertFalse(vfsStreamWrapper::getRoot()->hasChild($dir));
+
+        //with group
+        $cache->save('burger', 'cheese', $group = 'paradise');
+        $cache->save('nacho', 'guac', $group = 'paradise');
+        $this->assertEquals('cheese', $cache->get('burger', $group));
+
+        //no group, should not be removed
+        $cache->remove('burger');
+        $this->assertEquals('cheese', $cache->get('burger', $group));
+
+        //group, should be removed
+        $cache->remove('burger', 'paradise');
+        $this->assertNull($cache->get('burger', $group));
+
+        //others in group should remain
+        $this->assertEquals('guac', $cache->get('nacho', $group));
+        $this->assertTrue(vfsStreamWrapper::getRoot()->hasChild($dir = 'cache/paradise'));
+
+        //clean the group
+        $cache->clean('paradise');
+        $this->assertNull($cache->get('nacho', $group));
+        $this->assertFalse(vfsStreamWrapper::getRoot()->hasChild($dir));
     }
 
     public function testApacheMode()
