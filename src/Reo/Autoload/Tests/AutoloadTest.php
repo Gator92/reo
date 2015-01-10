@@ -61,6 +61,19 @@ class AutoloaderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello', $bluxer->talk());
     }
 
+    public function testPsr4Autoload()
+    {
+        $autoloader = $this->getAutoloader();
+        $autoloader->register($name = 'RocknRoll', $path = 'stairway/to/heaven', true);
+        $prefixes = $autoloader->getPrefixes();
+        $this->assertEquals($path, $prefixes[$name]);
+        $autoloader->register($name = 'Froggy', $path = __DIR__ . '/lib/Framework/Component', true);
+        $prefixes = $autoloader->getPrefixes();
+        $this->assertEquals($path, $prefixes[$name]);
+        $this->assertTrue($autoloader->checkRegistry('Froggy\Ribbet'));
+        $this->assertTrue(class_exists('Froggy\Ribbet', false), 'The loaded class does not exists.');
+    }
+
     private function getAutoloader()
     {
         return new Autoloader(array('lib' => __DIR__ . DIRECTORY_SEPARATOR.'lib'), array('register_spl' => false));

@@ -5,6 +5,7 @@ namespace Reo\Autoload;
  * AutoLoader
  *
  * Simple Autoloader registers a method with the spl autoloader to autoload psr-0 compliant classes.
+ * Also supports psr-4 compliant classes.
  *
  * Copyright (c) Schuyler W Langdon.
  *
@@ -30,15 +31,22 @@ class Autoloader
  * @note: For stuff like Zend 1, where classes are not designed to be autoloaded (contain require_once)
  */
     private $set_include_path = false;
+
 /**
  * @param array $paths stack of named library paths
  */
     private $paths = array();
+
 /**
  * @param $registry array registry stack of classes to map or skip (contain their own autoload)
  * @note checks the deepest namespace first, ie Framework\Component\Fabstuff will override Framework\Component
  */
     private $registry = array();
+
+/**
+ * @param $prefixes array registry stack of prefixes to map to a lib dir or load path ala psr-4
+ */
+    private $prefixes = array();
 
 /**
  * @param $register_spl bool whether or not to register class loader with spl autoloader
@@ -59,7 +67,7 @@ class Autoloader
  */
     public function __construct(array $paths = null, array $options = null, array $registry = null)
     {
-        if (isset($this->paths)) {
+        if (isset($paths)) {
             $this->paths = $paths;
         }
         if (isset($options)) {
@@ -154,6 +162,11 @@ class Autoloader
         return $this->registry;
     }
 
+    public function getPrefixes()
+    {
+        return $this->prefixes;
+    }
+
 /**
  * register
  *
@@ -161,9 +174,15 @@ class Autoloader
  *
  * @param $id string The class name or namespace to register
  * @param $loadPath string|bool directory path or bool false if lib loads itself
+ * @param $psr4 bool to map the namespace prefix to a load path
  */
-    public function register($name, $loadPath)
+    public function register($name, $loadPath, $psr4 = false)
     {
+        if ($psr4) {
+            //just map it
+            $this->prefixes[$name] = $loadPath;
+            return;
+        }
         $path = str_replace('_', \DIRECTORY_SEPARATOR, str_replace('\\', \DIRECTORY_SEPARATOR, $name));
         if (isset($this->classRegistry[$path])) {
             return false;
@@ -182,13 +201,23 @@ class Autoloader
 
     public function checkRegistry($class, $classPath = null)
     {
-        if (empty($this->registry)) {
-            return false;
-        }
         if (!isset($classPath)) {
             $classPath = str_replace('_', \DIRECTORY_SEPARATOR, str_replace('\\', \DIRECTORY_SEPARATOR, $class));
         }
         $paths = explode(\DIRECTORY_SEPARATOR, $classPath);
+
+        //check the new-fangled, fancy-dan psr4 autoloading classes
+        if (!empty($this->prefixes) && isset($this->prefixes[$paths[0]])) {
+            $prefix = array_shift($paths);
+            $classPath = implode(\DIRECTORY_SEPARATOR, $paths);
+            $loadPath = $this->prefixes[$prefix];
+            return $this->loadPath($classPath, (array) $loadPath);
+        }
+
+        if (empty($this->registry)) {
+            return false;
+        }
+
         $regPath = $classPath;
         for ($ct = count($paths), $xx = 0; $xx < $ct; $xx++) {
             if (isset($this->registry[$regPath])) {
