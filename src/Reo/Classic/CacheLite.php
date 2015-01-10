@@ -495,8 +495,7 @@ class Reo_Classic_CacheLite
     *
     * @param string $dir directory complete path (with a trailing slash)
     * @param string $group name of the cache group
-    * @param string $mode flush cache mode : 'old', 'ingroup', 'notingroup',
-                                             'callback_myFunction'
+    * @param string $mode flush cache mode : 'old', 'ingroup', 'notingroup', 'callback_myFunction'
     * @return boolean true if no problem
     * @access private
     */
