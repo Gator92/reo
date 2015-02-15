@@ -10,7 +10,7 @@ class CacheLiteTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        if (!@class_exists('org\\bovigo\\vfs\\vfsStreamWrapper', false)) {
+        if (!@class_exists('org\\bovigo\\vfs\\vfsStreamWrapper', true)) {
             $this->markTestSkipped('vfsStreamWrapper not found');
             return;
         }
@@ -328,6 +328,19 @@ class CacheLiteTest extends PHPUnit_Framework_TestCase
         $cache->setOption('readControl', false);
         $cache->save($key = 'burger', $value = 'cheese', $group = 'paradise');
         $this->assertFalse($cache->has($key, $group));
+    }
+
+    public function testFileExt()
+    {
+        $cache = $this->getCache();
+        $this->assertFalse($cache->has('cheeseburger'));
+        $this->assertNotNull($name = $cache->getFileName());
+        //add extension
+        $cache->setOption('fileExt', $ext = '.yum');
+        //reset file name
+        $this->assertFalse($cache->has('cheeseburger'));
+        //the name is the same, but with the appropriate ext
+        $this->assertEquals($name . $ext, $cache->getFileName());
     }
 
     private function getCache($apacheMode = false)
