@@ -67,7 +67,14 @@ class Reo_Classic_CacheLite
     * @var string $_file
     */
     protected $_file;
-    
+
+    /**
+    * File path
+    *
+    * @var string $filePath
+    */
+    protected $filePath;
+
     /**
     * File name (without path)
     *
@@ -358,7 +365,7 @@ class Reo_Classic_CacheLite
     {
         $this->_setFileName($id, $group);
 
-        if ($checkbeforeunlink && !file_exists($this->_file)) {
+        if ($checkbeforeunlink && !@file_exists($this->_file)) {
             return true;
         }
         return $this->_unlink($this->_file);
@@ -508,7 +515,12 @@ class Reo_Classic_CacheLite
     */
     protected function _unlink($file)
     {
-        return false === @unlink($file) ? !$this->debug : true;
+        $result = false === @unlink($file) ? !$this->debug : true;
+        // remove the cache dirs for standard mode
+        if ('standard' === $this->fileNameHashMode && @rmdir($this->filePath)) {
+            @rmdir(dirname($this->filePath));
+        }
+        return $result;
     }
 
     /**
@@ -595,7 +607,7 @@ class Reo_Classic_CacheLite
     */
     protected function _setFileName($id, $group = null, $write = false)
     {
-        $root = $this->cacheDir;
+        $this->filePath = $this->cacheDir;
         $fullPath = false;
 
         if ('none' === $this->fileNameHashMode) {
@@ -630,10 +642,10 @@ class Reo_Classic_CacheLite
                     }
                 }
             }
-            $root .= '/' . $fullPath;
+            $this->filePath .= '/' . $fullPath;
         }
 
-        $this->_file = $root . '/' . $this->_fileName . (isset($this->fileExt) ? $this->fileExt : '');
+        $this->_file = $this->filePath . '/' . $this->_fileName . (isset($this->fileExt) ? $this->fileExt : '');
     }
     
     /**

@@ -156,9 +156,12 @@ class CacheLiteTest extends PHPUnit_Framework_TestCase
         $cache = $this->getCache();
         $cache->save('nacho', 'chipolte');
         $this->assertEquals('chipolte', $cache->get('nacho'));
+        $this->assertTrue(is_dir($path = dirname($cache->getFileName())));
         $cache->remove('nacho');
         $this->assertNull($cache->get('nacho'));
-
+        //orphaned dirs are removed
+        $this->assertFalse(is_dir($path));
+        $this->assertFalse(is_dir(dirname($path)));
         //with group
         $cache->save('burger', 'cheese', $group = 'paradise');
         $cache->save('nacho', 'guac', $group = 'paradise');
