@@ -1,0 +1,35 @@
+{
+"name": "reo/dependencyinjection",
+"type": "library",
+"description": "Reo Collection Component",
+"keywords": ["dependency", "injection", "container"],
+"homepage": "http://reo.velargo.com",
+"license": "New BSD",
+"authors": [
+{
+"name": "Schuyler W Langdon",
+"email": "schuyler@velargo.com"
+}
+],
+"repositories": [
+{
+"name":"reo",
+"type": "vcs",
+"url": "file:///usr/www/lib/reo/.git"
+}
+],
+"require": {
+"php": ">=5.3.7"
+},
+"require-dev": {
+"reo": "master"
+},
+"autoload": {
+"psr-0": { "Reo\\": "/usr/www/lib/reo/src/Reo" }
+},
+"autoload-dev": {
+"psr-0": { "Reo\\": "/usr/www/lib/reo/src/Reo" }
+},
+"target-dir": "Reo/DependencyInjection",
+"minimum-stability": "dev"
+}
