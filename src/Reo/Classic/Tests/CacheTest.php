@@ -356,7 +356,7 @@ class CacheLiteTest extends PHPUnit_Framework_TestCase
     private function loadPrivateDir()
     {
         vfsStream::newDirectory('private')->at($root = vfsStreamWrapper::getRoot());
-        vfsStream::newFile('goodies')->at($root->getChild('private'))->setContent("Treasure Trove!");
+        vfsStream::newFile('goodies')->at($root->getChild('private'))->setContent('Treasure Trove!');
         return;
         $file = vfsStream::url('rootDir/private/goodies');
         file_put_contents($file, 'Treasure Trove!');

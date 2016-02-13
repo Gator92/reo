@@ -395,7 +395,20 @@ class Reo_Classic_CacheLite
         }
         return $result;
     }
-       
+
+    public function flush($group)
+    {
+        $this->emptyDirs = array();
+        $result = $this->_cleanDir($this->cacheDir, $group, 'ingroup');
+        //clean up the purged dirs
+        if (!empty($this->emptyDirs)) {
+            foreach (array_reverse($this->emptyDirs) as $dir) {
+                @rmdir($dir);
+            }
+        }
+        return $result;
+    }
+
     /**
     * Set to debug mode
     *
