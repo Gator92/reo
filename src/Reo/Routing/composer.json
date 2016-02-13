@@ -1,0 +1,35 @@
+{
+"name": "reo/routing",
+"type": "library",
+"description": "Reo Routing Component",
+"keywords": ["routing", "router", "route"],
+"homepage": "http://reo.velargo.com",
+"license": "New BSD",
+"authors": [
+{
+"name": "Schuyler W Langdon",
+"email": "schuyler@velargo.com"
+}
+],
+"repositories": [
+{
+"name":"reo",
+"type": "vcs",
+"url": "file:///usr/www/lib/reo/.git"
+}
+],
+"require": {
+"php": ">=5.3.7"
+},
+"require-dev": {
+"reo": "master"
+},
+"autoload": {
+"psr-0": { "Reo\\": "/usr/www/lib/reo/src/Reo" }
+},
+"autoload-dev": {
+"psr-0": { "Reo\\": "/usr/www/lib/reo/src/Reo" }
+},
+"target-dir": "Reo/Routing",
+"minimum-stability": "dev"
+}
