@@ -396,7 +396,7 @@ class Reo_Classic_CacheLite
         return $result;
     }
 
-    public function flush($group)
+    public function flush($group = false)
     {
         $this->emptyDirs = array();
         $result = $this->_cleanDir($this->cacheDir, $group, 'ingroup');
